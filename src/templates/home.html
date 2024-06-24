@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="fixed right-8 bottom-8 z-50">
+  <form action="/produto/carrinho" method="get">
+    <button class="flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white rounded-full w-12 h-12 focus:outline-none shadow-lg">
+      <svg viewBox="0 0 16 16" class="bi bi-cart2" fill="currentColor" height="16" width="16" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5zM3.14 5l1.25 5h8.22l1.25-5H3.14zM5 13a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0zm9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"></path>
+      </svg>
+      <span class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-blue-700 rounded-full">0</span>
+    </button>
+  </form>
+</div>
+<!--Main-->
+<!-- Hero Section -->
+<div class="relative flex h-screen items-center justify-center bg-cover bg-center bg-blend-multiply"
+  style="background-image: url('../static/images/bg_image.jpg');">
+
+  <div class="p-4 text-center text-white md:p-8">
+    <h1 class="mb-4 text-3xl font-bold md:text-5xl lg:text-6xl">Bem-vindo ao Market Zone</h1>
+    <p class="mb-8 text-base md:text-lg lg:text-2xl">Explore uma nova maneira de comprar e vender produtos incríveis!</p>
+    <div class="scroll-indicator" onclick="scrollToContent()">
+      <svg xmlns="http://www.w3.org/2000/svg" class="indicator-down cursor-pointer mx-auto h-8 w-8 md:h-10 md:w-10"
+        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- Content Section -->
+<div class="content h-full bg-gray-100 p-4 md:p-10">
+  <h1 class="mb-4 text-2xl font-bold md:text-4xl lg:text-5xl text-center">Nossos Produtos</h1>
+  <p class="text-base mb-6 md:text-lg lg:text-xl text-center">Aqui você encontra todos produtos cadastrados.</p>
+
+  <div class="grid grid-cols-2 p-6 md:grid-cols-3 gap-4">
+    {% if produtos %}
+      {% for produto in produtos %}
+        <div class="teste">
+          {% if produto.imagem %}
+            <div class="flex flex-col items-center justify-center p-8 bg-gray-100 rounded-lg shadow-md">
+              <img class="h-36 md:h-48 lg:h-64"
+              src="{{ produto.imagem }}" alt="{{ produto.nome }}">
+            </div>
+            {% else %}
+            <div class="flex flex-col items-center justify-center p-8 bg-gray-100 rounded-lg shadow-md">
+              <h1 class="text-xl md:text-2xl lg:text-3xl font-semibold text-gray-700">Imagem não fornecida</h1>
+              <img src="{{ url_for('static', path='images/no_image.svg') }}" alt="Ilustração de imagem não disponível"
+                   class="h-36 md:h-48 lg:h-64">
+              <p class="text-gray-600 mt-4 text-center">Esta imagem não está disponível no momento.</p>
+          </div>
+          {% endif %}
+          <div class="p-5 bg-gray-200">
+            <a href="#">
+              <h5 class="text-xl font-semibold tracking-tight text-gray-900">{{ produto.nome }}</h5>
+            </a>
+            <div class="mb-5 mt-2.5 flex items-center">
+              <div class="flex items-center space-x-1 rtl:space-x-reverse">
+                {% for star in range(1, 6) %}
+                  {% if produto.avaliacao %}
+                    {% if star <= produto.avaliacao %}
+                    <svg class="h-4 w-4 text-yellow-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                      fill="currentColor" viewBox="0 0 22 20">
+                      <path
+                        d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
+                    </svg>
+                    {% else %}
+                    <svg class="h-4 w-4 text-gray-200 dark:text-gray-600" aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                      <path
+                        d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
+                    </svg>
+                    {% endif %}
+                    {% else %}
+                    <svg class="h-4 w-4 text-gray-200 dark:text-gray-600" aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                    <path
+                      d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
+                  </svg>
+                  {% endif %}
+                {% endfor %}
+              </div>
+              <span
+                class="ms-3 rounded bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-800 dark:bg-blue-200 dark:text-blue-800">{{ produto.avaliacao }}.0</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-3xl font-bold text-gray-900">R${{ produto.preco }}</span>
+              <form action="/produto/add-to-cart" method="post">
+                <input type="hidden" name="product_id" value="{{ produto.id_produto }}">
+                <button type="submit" class="rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Adicionar ao carrinho</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+      {% else %}
+        <h1 class="text-center">Não há produtos cadastrados.</h1>
+      {% endif %}
+  </div>
+
+</div>
+
+
+<div id="gallery" class="relative w-full" data-carousel="static">
+  <!-- Carousel wrapper -->
+  <div class="relative h-56 overflow-hidden md:h-96">
+    <!-- Item 1 -->
+    <div class="hidden duration-700 ease-in-out" data-carousel-item>
+      <!-- Background Image -->
+      <img src="{{ url_for('static', path='images/bg_gallery.jpg') }}"
+        class="block w-full h-full object-cover" alt="Background Image">
+      <!-- Overlay Text -->
+      <div class="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 text-white p-4">
+        <h1 class="mb-4 text-2xl md:text-4xl lg:text-5xl font-bold text-center">Não possui um cadastro? Cadastre-se já
+          clicando no botão abaixo!</h1>
+        <button
+          class="px-6 py-2 text-lg font-semibold bg-blue-600 hover:bg-blue-700 transition duration-300 rounded-lg shadow-md">
+          Cadastre-se
+        </button>
+      </div>
+    </div>
+    <!-- Item 2 -->
+    <div class="hidden duration-700 ease-in-out" data-carousel-item="active">
+      <!-- Background Image -->
+      <img src="{{ url_for('static', path='images/bg_gallery.jpg') }}"
+        class="block w-full h-full object-cover" alt="Background Image">
+      <!-- Overlay Text -->
+      <div class="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 text-white p-4">
+        <h1 class="mb-4 text-2xl md:text-4xl lg:text-5xl font-bold text-center">Adicione seus produtos ao nosso
+          catálogo!</h1>
+        <form action="/produto/cadastro" method="get">
+          <button type="submit" class="px-6 py-2 text-lg font-semibold bg-green-600 hover:bg-green-700 transition duration-300 rounded-lg shadow-md">
+            Adicionar Produto
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- Slider controls -->
+  <button type="button"
+    class="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
+    data-carousel-prev>
+    <span
+      class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
+      <svg class="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180" aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 1 1 5l4 4" />
+      </svg>
+      <span class="sr-only">Previous</span>
+    </span>
+  </button>
+  <button type="button"
+    class="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
+    data-carousel-next>
+    <span
+      class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
+      <svg class="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180" aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4" />
+      </svg>
+      <span class="sr-only">Next</span>
+    </span>
+  </button>
+</div>
+
+
+{% endblock %}
