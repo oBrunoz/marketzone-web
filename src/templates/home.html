@@ -85,10 +85,14 @@
             </div>
             <div class="flex items-center justify-between">
               <span class="text-3xl font-bold text-gray-900">R${{ produto.preco }}</span>
-              <form action="/produto/add-to-cart" method="post">
-                <input type="hidden" name="product_id" value="{{ produto.id_produto }}">
-                <button type="submit" class="rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Adicionar ao carrinho</button>
-              </form>
+<!-- HTML -->
+<form id="add-to-cart-form" data-product-id="{{ produto.id_produto }}">
+  <input type="hidden" name="product_id" value="{{ produto.id_produto }}">
+  <button id="add-to-cart-button" type="button" class="rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+    Adicionar ao carrinho
+  </button>
+</form>
+
             </div>
           </div>
         </div>

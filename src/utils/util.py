@@ -31,7 +31,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
     return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
 
-def flash(request: Request, message: typing.Any, category: str = "primary") -> None:
+def flash(request: Request, message: typing.Any, category: str = "primary"):
     """
     Função para adicionar uma mensagem de flash à sessão do usuário.
 
@@ -45,18 +45,3 @@ def flash(request: Request, message: typing.Any, category: str = "primary") -> N
     timestamp = time.time()
     request.session["_messages"].append({"message": message, "category": category, "timestamp": timestamp})
 
-def get_flashed_messages(request: Request, max_age_seconds: int = 300):
-    """
-    Função para obter mensagens de flash válidas da sessão do usuário.
-
-    Args:
-    - request (Request): Objeto da requisição FastAPI.
-    - max_age_seconds (int): Tempo máximo em segundos para manter as mensagens na sessão (opcional, padrão é 300).
-
-    Returns:
-    - List[dict]: Lista de mensagens de flash válidas.
-    """
-    current_time = time.time()
-    messages = request.session.pop("_messages", [])
-    valid_messages = [msg for msg in messages if current_time - msg.get("timestamp", 0) <= max_age_seconds]
-    return valid_messages

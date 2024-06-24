@@ -110,17 +110,20 @@ async def cadastrar_produto(
         flash(request, "Produto adicionado com sucesso!", "success")
         return RedirectResponse("/", status_code=303)
 
-    return {"message": "Houve um problema ao cadastrar o produto"}
+    flash(request, "Houve um problema ao cadastrar o produto", "red")
+    return RedirectResponse('/', 303)
 
 @produto_router.post('/add-to-cart')
 async def add_to_cart(request: Request, db: Session = Depends(get_db), product_id: int = Form(...)):
     produto = get_produto(db, product_id)
     if not produto:
         raise HTTPException(status_code=404, detail="Produto não encontrado")
-    session_cart = request.session.get('cart_items', {})
-        # Debug: print the type and contents of session_cart
-    # print(f"Session Cart Before: {session_cart}")
+    # session_cart = request.session.get('cart_items', {})
+    session_cart: Dict[str, Dict[str, int]] = request.session.get('cart_items', {})
 
+    # Debug: print the type and contents of session_cart
+    print(f"Session Cart Before: {session_cart}")
+    
     # Verificar se o produto já está no carrinho e incrementar a quantidade
     if str(product_id) in session_cart:
         print('caiu no incremento')
@@ -131,16 +134,25 @@ async def add_to_cart(request: Request, db: Session = Depends(get_db), product_i
             "product_id": product_id,
             "quantity": 1
         }
+
     request.session["cart_items"] = session_cart
+    # print(f'Session cart after: ', request.session["cart_items"])
 
-    # Debug: print the updated cart
-    # print(f"Session Cart After: {request.session.get('cart_items', {})}")
-
-    return JSONResponse(content={"message": "Produto adicionado ao carrinho"})
+    # flash(request, f"Produto adicionado ao carrinho", "blue")
+    # return JSONResponse({"message": 'FOI PORRA'})
+    # return RedirectResponse('/', 303)
+    return JSONResponse(status_code=200, content={
+        "message": "Produto adicionado ao carrinho",
+        "cart": session_cart,
+        "product_id": product_id,
+        "quantity": session_cart[str(product_id)]["quantity"]
+    })
 
 @produto_router.get('/carrinho', response_class=HTMLResponse)
 async def cart(request: Request, db: Session = Depends(get_db)):
     session_cart = request.session.get("cart_items", {})
+    print(session_cart)
+    print(request.session.get('user', {}))
 
     product_ids = list(session_cart.keys())
 

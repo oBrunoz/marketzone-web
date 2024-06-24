@@ -29,45 +29,45 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Clique na área de dropzone abre o seletor de arquivo
   dropzone.addEventListener('click', () => {
-      fileInput.click();
+    fileInput.click();
   });
 
   // Quando o arquivo é selecionado através do seletor de arquivo
   fileInput.addEventListener('change', () => {
-      handleFiles(fileInput.files);
+    handleFiles(fileInput.files);
   });
 
   // Quando os arquivos são arrastados para o dropzone
   dropzone.addEventListener('dragover', (event) => {
-      event.preventDefault();
-      dropzone.classList.add('dragover');
+    event.preventDefault();
+    dropzone.classList.add('dragover');
   });
 
   dropzone.addEventListener('dragleave', () => {
-      dropzone.classList.remove('dragover');
+    dropzone.classList.remove('dragover');
   });
 
   dropzone.addEventListener('drop', (event) => {
-      event.preventDefault();
-      dropzone.classList.remove('dragover');
-      const files = event.dataTransfer.files;
-      fileInput.files = files; // Atualiza o input com os arquivos arrastados
-      handleFiles(files);
+    event.preventDefault();
+    dropzone.classList.remove('dragover');
+    const files = event.dataTransfer.files;
+    fileInput.files = files; // Atualiza o input com os arquivos arrastados
+    handleFiles(files);
   });
 
   // Função para lidar com arquivos selecionados ou arrastados
   function handleFiles(files) {
-      if (files.length) {
-          const file = files[0];
-          // Atualiza a visualização do dropzone com o nome do arquivo
-          dropzone.innerHTML = `<span class="text-gray-500">Arquivo selecionado: ${file.name}</span>`;
-      }
+    if (files.length) {
+      const file = files[0];
+      // Atualiza a visualização do dropzone com o nome do arquivo
+      dropzone.innerHTML = `<span class="text-gray-500">Arquivo selecionado: ${file.name}</span>`;
+    }
   }
 
   const stars = document.querySelectorAll('.star');
 
   stars.forEach(star => {
-    star.addEventListener('click', function() {
+    star.addEventListener('click', function () {
       const value = parseInt(this.getAttribute('data-value'));
 
       // Marca as estrelas conforme o valor clicado
@@ -83,9 +83,71 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
+
+});
+// Seleciona todos os botões de adicionar ao carrinho
+const addToCartButtons = document.querySelectorAll('#add-to-cart-button');
+
+addToCartButtons.forEach(button => {
+  button.addEventListener('click', async function (event) {
+    event.preventDefault(); // Previne a ação padrão do formulário (recarregar a página)
+
+    const form = button.closest('#add-to-cart-form'); // Encontra o formulário correspondente
+    const productId = form.getAttribute('data-product-id'); // Obtém o ID do produto do atributo data
+
+    // Obtém os dados do formulário
+    const formData = new FormData(form);
+    formData.append('product_id', productId); // Assegura que o product_id está nos dados
+
+    // Obtém o elemento de contador de quantidade
+    const quantityCounter = form.querySelector('.quantity-counter');
+
+    try {
+      const response = await fetch('/produto/add-to-cart', {
+        method: 'POST',
+        body: new URLSearchParams(formData) // Converte os dados do formulário para URLSearchParams
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Log de sucesso no console
+        console.log(`Produto ${productId} adicionado ao carrinho`, data);
+
+        // Atualiza a quantidade exibida
+        let currentQuantity = parseInt(quantityCounter.textContent.replace('Quantidade: ', '')) || 0;
+        currentQuantity += 1;
+        quantityCounter.textContent = `Quantidade: ${currentQuantity}`;
+
+        // Muda o botão para indicar adição ao carrinho
+        button.style.backgroundColor = 'green';
+        button.innerText = `Adicionado ao carrinho (${currentQuantity})`;
+      } else {
+        // Lida com erro na resposta do servidor
+        console.error('Erro ao adicionar produto ao carrinho');
+        // Volta o botão ao estado original
+        button.style.backgroundColor = 'red';
+        button.innerText = 'Erro ao adicionar';
+        setTimeout(() => {
+          button.style.backgroundColor = 'blue';
+          button.innerText = 'Adicionar ao carrinho';
+        }, 2000); // Reseta após 2 segundos
+      }
+    } catch (error) {
+      // Lida com erro na comunicação
+      console.error('Erro de rede ao adicionar produto ao carrinho:', error);
+      // Volta o botão ao estado original
+      button.style.backgroundColor = 'red';
+      button.innerText = 'Erro ao adicionar';
+      setTimeout(() => {
+        button.style.backgroundColor = 'blue';
+        button.innerText = 'Adicionar ao carrinho';
+      }, 2000); // Reseta após 2 segundos
+    }
+  });
 });
 
+
 // Tornar a função scrollToContent globalmente acessível
-window.scrollToContent = function() {
+window.scrollToContent = function () {
   document.querySelector('.content').scrollIntoView({ behavior: 'smooth' });
 };

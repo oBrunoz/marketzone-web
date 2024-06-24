@@ -8,8 +8,7 @@ from .database.db import engine, get_db
 from .services import crud_service
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from src.utils.util import flash, get_flashed_messages, hash_password
-from src.views.user_router import user_router
+from src.utils.util import flash, hash_password
 from src.views.routes import produto_router
 from starlette.middleware import Middleware
 from starlette.middleware.sessions import SessionMiddleware
@@ -39,16 +38,14 @@ app.mount("/static", StaticFiles(directory="src/static"), name="static")
 
 # Configuração de templates com JINJA2
 templates = Jinja2Templates(directory="src/templates")
-# templates.env.globals["get_flashed_messages"] = get_flashed_messages
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Registra o roteador de usuário
-app.include_router(user_router)
 app.include_router(produto_router)
 
 # Importação de rotas
-from src.views import routes, user_router
+from src.views import routes
 
 # Rota principal - HOME
 @app.get('/', response_class=HTMLResponse)
@@ -105,13 +102,16 @@ async def logar_user(request: Request, db: Session = Depends(get_db), email: str
         "username": user.username
     }
     
-    return 'Logado com sucesso!'
+    flash(request, f"Usuário {user.username} logado com sucesso!", "green")
+    return RedirectResponse('/', status_code=303)
 
 @app.get("/logout")
 async def logout(request: Request):
     if "user" in request.session:
         del request.session["user"]
-    return {"message": "Logout bem-sucedido"}
+
+    flash(request, f"Usuário deslogado.", "blue")
+    return RedirectResponse('/', status_code=303)
 
 @app.get("/profile", response_class=HTMLResponse)
 async def profile(request: Request, db: Session = Depends(get_db)):
