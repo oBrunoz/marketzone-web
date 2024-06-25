@@ -139,7 +139,6 @@ async def add_to_cart(request: Request, db: Session = Depends(get_db), product_i
     # print(f'Session cart after: ', request.session["cart_items"])
 
     # flash(request, f"Produto adicionado ao carrinho", "blue")
-    # return JSONResponse({"message": 'FOI PORRA'})
     # return RedirectResponse('/', 303)
     return JSONResponse(status_code=200, content={
         "message": "Produto adicionado ao carrinho",
