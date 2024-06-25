@@ -80,7 +80,6 @@ async def cadastrar_user(request: Request, db: Session = Depends(get_db), userna
         return templates.TemplateResponse("cadastro_user.html", {"request": request})
 
     if db_user:
-        flash(request, "Usuário cadastrado com sucesso!", "green")
         return RedirectResponse("/login", status_code=303)
     else:
         flash(request, "Houve um erro ao cadastrar usuário. Tente novamente ou contate um administrador.", "red")
@@ -102,15 +101,13 @@ async def logar_user(request: Request, db: Session = Depends(get_db), email: str
         "username": user.username
     }
     
-    flash(request, f"Usuário {user.username} logado com sucesso!", "green")
-    return RedirectResponse('/', status_code=303)
+    return 'logado'
 
 @app.get("/logout")
 async def logout(request: Request):
     if "user" in request.session:
         del request.session["user"]
 
-    flash(request, f"Usuário deslogado.", "blue")
     return RedirectResponse('/', status_code=303)
 
 @app.get("/profile", response_class=HTMLResponse)
@@ -158,5 +155,4 @@ async def update_profile(request: Request, db: Session = Depends(get_db), userna
         "email": db_user.email
     }
 
-    flash(request, "Dados de usuário atualizados com sucesso!", "green")
     return RedirectResponse("/", status_code=303)

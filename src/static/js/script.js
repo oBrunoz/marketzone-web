@@ -98,9 +98,9 @@ addToCartButtons.forEach(button => {
     // Obtém os dados do formulário
     const formData = new FormData(form);
     formData.append('product_id', productId); // Assegura que o product_id está nos dados
-
+    const cartMiniValue = document.getElementById('cartValue')
     // Obtém o elemento de contador de quantidade
-    const quantityCounter = document.querySelectorAll('.quantity-counter');
+    // const quantityCounter = document.querySelectorAll('.quantity-counter');
 
     try {
       const response = await fetch('/produto/add-to-cart', {
@@ -110,17 +110,28 @@ addToCartButtons.forEach(button => {
 
       if (response.ok) {
         const data = await response.json();
+
         // Log de sucesso no console
         console.log(`Produto ${productId} adicionado ao carrinho`, data);
 
+        let totalQuantity = 0;
+        for(const productId in data) {
+          console.log(data.quantity)
+          totalQuantity += data.quantity
+        }
+        
+        console.log(totalQuantity)
         // Atualiza a quantidade exibida
-        let currentQuantity = parseInt(quantityCounter.textContent.replace('Quantidade: ', '')) || 0;
-        currentQuantity += 1;
-        quantityCounter.textContent = `Quantidade: ${currentQuantity}`;
+        let currentQuantity = data.quantity;
 
         // Muda o botão para indicar adição ao carrinho
+        cartMiniValue.innerText = `${data.total}`
         button.style.backgroundColor = 'green';
         button.innerText = `Adicionado ao carrinho (${currentQuantity})`;
+        setTimeout(() => {
+          button.style.backgroundColor = 'rgb(37 99 235 / var(--tw-bg-opacity))';
+          button.innerText = 'Adicionar ao carrinho';
+        }, 5000); // Reseta após 2 segundos
       } else {
         // Lida com erro na resposta do servidor
         console.error('Erro ao adicionar produto ao carrinho');
@@ -128,7 +139,7 @@ addToCartButtons.forEach(button => {
         button.style.backgroundColor = 'red';
         button.innerText = 'Erro ao adicionar';
         setTimeout(() => {
-          button.style.backgroundColor = 'blue';
+          button.style.backgroundColor = 'rgb(37 99 235 / var(--tw-bg-opacity))';
           button.innerText = 'Adicionar ao carrinho';
         }, 2000); // Reseta após 2 segundos
       }
@@ -139,46 +150,64 @@ addToCartButtons.forEach(button => {
       button.style.backgroundColor = 'red';
       button.innerText = 'Erro ao adicionar';
       setTimeout(() => {
-        button.style.backgroundColor = 'blue';
+        button.style.backgroundColor = 'rgb(37 99 235 / var(--tw-bg-opacity))';
         button.innerText = 'Adicionar ao carrinho';
       }, 2000); // Reseta após 2 segundos
     }
   });
+
 });
 
-document.querySelectorAll(".delete-from-cart-btn").forEach(button => {
-  button.addEventListener("click", function (event) {
-    event.preventDefault(); // Impede o comportamento padrão do botão
+const buyButton = document.getElementById('buy-button');
+console.log('capturado')
 
-    const itemId = this.getAttribute("data-item-id");
+buyButton.addEventListener('click', async function (event) {
+  event.preventDefault(); // Previne a ação padrão do botão
 
-    // Fazer a requisição AJAX
-    fetch("/produto/carrinho/deletar", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: new URLSearchParams({ "item_id": itemId })
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.status === "success") {
-          // Atualizar a quantidade exibida ou remover o item do DOM
-          const productDiv = document.querySelector(`[data-product-id="${itemId}"]`);
-          const quantitySpan = document.querySelector(".quantity-counter");
+  // Seleciona todos os itens do carrinho
+  const cartItems = document.querySelectorAll('.cart-item');
+  let totalPrice = 0;
 
-          if (data.quantity > 0) {
-            quantitySpan.textContent = `Quantidade: ${data.quantity}`;
-          } else {
-            productDiv.remove()
-          }
+  let teste = updateSubtotal();
 
-          console.log(data.item_id, data.quantity)
-        }
-      })
-      .catch(error => console.error("Error:", error));
-  });
+  // Calcula o preço total somando o preço de cada item multiplicado pela sua quantidade
+  // cartItems.forEach(item => {
+  //   const price = parseFloat(item.querySelector('.item-price').textContent);
+  //   const quantity = parseInt(item.querySelector('.item-quantity').textContent);
+  //   totalPrice += price * quantity;
+  // });
+
+  // Cria um FormData para enviar o preço total
+  const formData = new FormData();
+  formData.append('total_price', teste);
+
+  try {
+    const response = await fetch('/produto/carrinho/comprar', {
+      method: 'POST',
+      body: new URLSearchParams(formData)
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('Compra realizada com sucesso:', data);
+
+      // Mostra uma mensagem de sucesso ou redireciona o usuário
+      alert('Compra realizada com sucesso!');
+      window.location.href = '/produto/carrinho'; // Redireciona para a página do carrinho
+    } else {
+      console.error('Erro ao realizar a compra');
+      alert('Erro ao realizar a compra, por favor tente novamente.');
+    }
+  } catch (error) {
+    console.error('Erro de rede ao realizar a compra:', error);
+    alert('Erro de rede, por favor tente novamente.');
+  }
 });
+
+// Tornar a função scrollToContent globalmente acessível
+window.scrollToContent = function () {
+  document.querySelector('.content').scrollIntoView({ behavior: 'smooth' });
+};
 
 function updateSubtotal() {
   // Calcular o subtotal com base nos elementos ainda no carrinho
@@ -191,13 +220,8 @@ function updateSubtotal() {
 
   // Atualizar o subtotal exibido
   document.getElementById("subtotal").textContent = `R$${subtotal.toFixed(2)}`;
+  return subtotal.toFixed(2);
 }
 
 // Inicializar o subtotal ao carregar a página
 updateSubtotal();
-
-
-// Tornar a função scrollToContent globalmente acessível
-window.scrollToContent = function () {
-  document.querySelector('.content').scrollIntoView({ behavior: 'smooth' });
-};

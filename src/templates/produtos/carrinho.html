@@ -21,7 +21,9 @@
                             <div class="col-span-12 lg:col-span-10 detail w-full lg:pl-3">
                                 <div class="flex items-center justify-between w-full mb-4">
                                     <h5 class="font-manrope font-bold text-2xl leading-9 text-gray-900">{{ item.product_name }}</h5>
-                                        <button data-item-id="{{ item.product_id }}" type="submit" class="delete-from-cart-btn rounded-full group flex items-center justify-center focus-within:outline-red-500">
+                                    <form action="/produto/carrinho/deletar" method="post">
+                                        <input type="hidden" name="item_id" value="{{ item.product_id }}">
+                                        <button type="submit" class="rounded-full group flex items-center justify-center focus-within:outline-red-500">
                                             <svg width="34" height="34" viewBox="0 0 34 34" fill="none"
                                             xmlns="http://www.w3.org/2000/svg">
                                             <circle class="fill-red-50 transition-all duration-500 group-hover:fill-red-400"
@@ -31,6 +33,7 @@
                                             stroke="#EF4444" stroke-width="1.6" stroke-linecap="round" />
                                         </svg>
                                     </button>
+                                </form>
                                 </div>
                                 <p class="font-normal text-base leading-7 text-gray-500 mb-6">
                                     {{ item.product_descricao }}
@@ -45,18 +48,20 @@
                             </div>
                         </div>
                 {% endfor %}
-                {% else %}
-                <h1>Carrinho vazio!</h1>
-            {% endif %}
-            <div class="flex items-center justify-between border-t border-gray-200 p-4 lg:p-6">
-                <h5 class="font-semibold text-xl text-gray-900">Subtotal</h5>
-                <div class="flex items-center gap-4">
-                    <h6 id="subtotal" class="font-bold text-xl text-indigo-600">$440</h6>
+                <div class="flex items-center justify-between border-t border-gray-200 p-4 lg:p-6">
+                    <h5 class="font-semibold text-xl text-gray-900">Subtotal</h5>
+                    <div class="flex items-center gap-4">
+                        <h6 id="subtotal" class="font-bold text-xl text-indigo-600">R$440</h6>
+                    </div>
                 </div>
-            </div>
-            <div class="p-4 lg:p-6">
-                <button class="bg-indigo-600 text-white font-semibold text-lg px-8 py-4 rounded-full hover:bg-indigo-700 transition duration-300 w-full">Comprar</button>
-            </div>
+                <div class="p-4 lg:p-6">
+                    <form id="buyForm">
+                        <button id="buy-button" class="bg-indigo-600 text-white font-semibold text-lg px-8 py-4 rounded-full hover:bg-indigo-700 transition duration-300 w-full">Comprar</button>
+                    </form>
+                </div>
+                {% else %}
+                <h1 class="w-full text-center">Carrinho vazio!</h1>
+                {% endif %}
         </div>
     </section>
     

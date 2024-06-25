@@ -1,4 +1,4 @@
-from fastapi import Request
+from fastapi import HTTPException, Request
 from typing import Optional
 import typing
 import time
@@ -45,3 +45,12 @@ def flash(request: Request, message: typing.Any, category: str = "primary"):
     timestamp = time.time()
     request.session["_messages"].append({"message": message, "category": category, "timestamp": timestamp})
 
+def get_current_user_id(request: Request):
+    """
+    Função de exemplo para recuperar o ID do usuário logado da sessão.
+    Esta função deve ser ajustada conforme sua implementação específica de autenticação.
+    """
+    user_id = request.session.get('user')  # Assumindo que 'user_id' é como você armazena o ID na sessão
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Usuário não autenticado")
+    return user_id

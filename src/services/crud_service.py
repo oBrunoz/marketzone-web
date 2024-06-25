@@ -18,7 +18,7 @@ def get_produtos_by_ids(db: Session, produto_ids: List[int]) -> List[Produto]:
     return db.query(Produto).filter(Produto.id_produto.in_(produto_ids)).all()
 
 def get_produtos(db: Session, skip: int = 0, limit: int = 10):
-    return db.query(Produto).offset(skip).limit(limit).all()
+    return db.query(Produto).filter(Produto.is_active == True).offset(skip).limit(limit).all()
 
 def create_produto(db: Session, produto: ProdutoCreate):
     db_produto = Produto(**produto.model_dump())

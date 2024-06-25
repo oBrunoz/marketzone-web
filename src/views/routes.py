@@ -11,7 +11,7 @@ from src.database.db import SessionLocal, engine, get_db
 from src.schemas import produto_schema, user_schema
 from src.services import crud_service
 from src.services.crud_service import create_produto, get_produto, get_produtos, get_produtos_by_ids
-from src.utils.util import flash
+from src.utils.util import flash, get_current_user_id
 from pathlib import Path
 
 UPLOAD_DIRECTORY = Path("src") / "static" / "uploads"
@@ -28,10 +28,19 @@ produto_router = APIRouter(
 # Rota de página de cadastro
 @produto_router.get('/cadastro', response_class=HTMLResponse)
 async def cadastro(request: Request):
-    return templates.TemplateResponse(
-        name='produtos/cadastrar.html',
-        request=request
-    )
+
+    if request.session.get('user'):
+        print('pode acessar')
+        return templates.TemplateResponse(
+            name='produtos/cadastrar.html',
+            request=request
+        )
+    else:
+        print('Usuário não autenticado, redirecionando para a página de login')
+        flash(request, "Para adicionar um produto, por favor, faça login", "green")
+        # Redireciona para a página de login (substitua '/login' pela rota correta)
+        return RedirectResponse(url='/login', status_code=303)
+
 
 # Método POST para cadastrar o produto
 @produto_router.post('/cadastro')
@@ -43,7 +52,8 @@ async def cadastrar_produto(
     preco: str = Form(...),
     categoria: str = Form(...),
     rating: int = Form(None),
-    imagem: UploadFile = File(None)
+    imagem: UploadFile = File(None),
+    user_id: int = Depends(get_current_user_id)
 ):
     cleaned_value = preco.replace('R$', '').replace('.', '').replace(',', '.')
     preco_decimal = Decimal(cleaned_value)
@@ -93,25 +103,30 @@ async def cadastrar_produto(
             print(f'Erro ao fazer upload da imagem. {e}')
             raise HTTPException(status_code=500, detail="Erro ao fazer upload da imagem.")
     
-    # Criação do objeto ProdutoCreate
-    data_produto = produto_schema.ProdutoCreate(
-        nome=nome,
-        descricao=descricao,
-        preco=preco_decimal,
-        categoria=categoria,
-        avaliacao=rating if rating else 0,
-        imagem=image_path
-    )
+    try:
+        # Criação do objeto ProdutoCreate
+        data_produto = produto_schema.ProdutoCreate(
+            nome=nome,
+            descricao=descricao,
+            preco=preco_decimal,
+            categoria=categoria,
+            avaliacao=rating if rating else 0,
+            imagem=image_path,
+            user_id=user_id['id']
+        )
 
-    # Chamada para o serviço CRUD para criar o produto
-    db_produto = create_produto(db=db, produto=data_produto)
+        # Chamada para o serviço CRUD para criar o produto
+        db_produto = create_produto(db=db, produto=data_produto)
 
-    if db_produto:
-        flash(request, "Produto adicionado com sucesso!", "success")
-        return RedirectResponse("/", status_code=303)
-
-    flash(request, "Houve um problema ao cadastrar o produto", "red")
-    return RedirectResponse('/', 303)
+        if db_produto:
+            print('produto cadastrado')
+            return RedirectResponse("/", status_code=303)
+        else:
+            print('nao cadastrado')
+            return templates.TemplateResponse("produtos/cadastrar.html", {"request": request})
+    except Exception as e:
+        print(e)
+        return templates.TemplateResponse("produtos/cadastrar.html", {"request": request})
 
 @produto_router.post('/add-to-cart')
 async def add_to_cart(request: Request, db: Session = Depends(get_db), product_id: int = Form(...)):
@@ -126,25 +141,24 @@ async def add_to_cart(request: Request, db: Session = Depends(get_db), product_i
     
     # Verificar se o produto já está no carrinho e incrementar a quantidade
     if str(product_id) in session_cart:
-        print('caiu no incremento')
         session_cart[str(product_id)]["quantity"] += 1
     else:
-        print('caiu no else')
         session_cart[str(product_id)] = {
             "product_id": product_id,
-            "quantity": 1
+            "quantity": 1,
         }
+    
+    total_quantity = sum(item_data['quantity'] for item_data in session_cart.values())
 
+    request.session["total"] = total_quantity
     request.session["cart_items"] = session_cart
-    # print(f'Session cart after: ', request.session["cart_items"])
 
-    # flash(request, f"Produto adicionado ao carrinho", "blue")
-    # return RedirectResponse('/', 303)
     return JSONResponse(status_code=200, content={
         "message": "Produto adicionado ao carrinho",
         "cart": session_cart,
         "product_id": product_id,
-        "quantity": session_cart[str(product_id)]["quantity"]
+        "quantity": session_cart[str(product_id)]["quantity"],
+        "total": total_quantity
     })
 
 @produto_router.get('/carrinho', response_class=HTMLResponse)
@@ -180,17 +194,41 @@ async def cart(request: Request, db: Session = Depends(get_db)):
 @produto_router.post('/carrinho/deletar', response_class=HTMLResponse)
 def delete_element(request: Request, item_id: int = Form(...)):
     session_cart = request.session.get("cart_items", {})
+    session_total = request.session.get('total', 0)
 
     item_id_str = str(item_id)
 
     if item_id_str in session_cart:
         if session_cart[item_id_str]['quantity'] > 1:
             session_cart[item_id_str]['quantity'] -= 1
+            session_total -= 1
         else:
             del session_cart[item_id_str]
+            session_total -= 1
 
         request.session["cart_items"] = session_cart
+        request.session['total'] = session_total
 
-        print(session_cart[item_id_str]['quantity'])
+    return RedirectResponse('/produto/carrinho', status_code=303)
 
-    return JSONResponse({"status": "success", "message": "Item removido com sucesso", "item_id": item_id_str, "quantity": session_cart.get(item_id_str, {}).get("quantity", 0)})
+@produto_router.post('/carrinho/comprar', response_class=HTMLResponse)
+async def realizar_compra(request: Request, db: Session = Depends(get_db), total_price: float = Form(...)):
+    session_cart: Dict[str, Dict[str, int]] = request.session.get('cart_items', {})
+
+    if not session_cart:
+        raise HTTPException(status_code=400, detail="Carrinho está vazio")
+
+    # Validação e atualização de estoque
+    for item_id, item_data in session_cart.items():
+        produto = get_produto(db, int(item_id))  # Função que busca o produto no banco
+        produto.is_active = False
+
+        db.add(produto)
+
+    db.commit()
+
+    # Limpa o carrinho após a compra
+    request.session.pop('cart_items', None)
+    request.session.pop('total', None)
+
+    return JSONResponse({"status": "success", "message": "Compra realizada com sucesso!"})

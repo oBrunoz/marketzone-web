@@ -7,7 +7,11 @@
       <svg viewBox="0 0 16 16" class="bi bi-cart2" fill="currentColor" height="16" width="16" xmlns="http://www.w3.org/2000/svg">
         <path d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5zM3.14 5l1.25 5h8.22l1.25-5H3.14zM5 13a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0zm9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"></path>
       </svg>
-      <span class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-blue-700 rounded-full">0</span>
+      {% if request.session['total'] %}
+        <span id="cartValue" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-blue-700 rounded-full">{{ request.session['total'] }}</span>
+        {% else %}
+        <span id="cartValue" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-blue-700 rounded-full">0</span>
+      {% endif %}
     </button>
   </form>
 </div>
@@ -85,14 +89,12 @@
             </div>
             <div class="flex items-center justify-between">
               <span class="text-3xl font-bold text-gray-900">R${{ produto.preco }}</span>
-<!-- HTML -->
-<form id="add-to-cart-form" data-product-id="{{ produto.id_produto }}">
-  <input type="hidden" name="product_id" value="{{ produto.id_produto }}">
-  <button id="add-to-cart-button" type="button" class="rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-    Adicionar ao carrinho
-  </button>
-</form>
-
+            <form id="add-to-cart-form" data-product-id="{{ produto.id_produto }}">
+              <input type="hidden" name="product_id" value="{{ produto.id_produto }}">
+              <button id="add-to-cart-button" type="button" class="rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                Adicionar ao carrinho
+              </button>
+            </form>
             </div>
           </div>
         </div>
@@ -105,7 +107,7 @@
 </div>
 
 
-<div id="gallery" class="relative w-full" data-carousel="static">
+<div id="gallery" class="relative w-full" data-carousel="slide">
   <!-- Carousel wrapper -->
   <div class="relative h-56 overflow-hidden md:h-96">
     <!-- Item 1 -->
