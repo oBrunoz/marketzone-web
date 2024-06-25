@@ -184,7 +184,13 @@ def delete_element(request: Request, item_id: int = Form(...)):
     item_id_str = str(item_id)
 
     if item_id_str in session_cart:
-        del session_cart[item_id_str]
+        if session_cart[item_id_str]['quantity'] > 1:
+            session_cart[item_id_str]['quantity'] -= 1
+        else:
+            del session_cart[item_id_str]
+
         request.session["cart_items"] = session_cart
 
-    return RedirectResponse('/produto/carrinho', status_code=303)
+        print(session_cart[item_id_str]['quantity'])
+
+    return JSONResponse({"status": "success", "message": "Item removido com sucesso", "item_id": item_id_str, "quantity": session_cart.get(item_id_str, {}).get("quantity", 0)})

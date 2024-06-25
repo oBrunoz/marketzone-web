@@ -100,7 +100,7 @@ addToCartButtons.forEach(button => {
     formData.append('product_id', productId); // Assegura que o product_id está nos dados
 
     // Obtém o elemento de contador de quantidade
-    const quantityCounter = form.querySelector('.quantity-counter');
+    const quantityCounter = document.querySelectorAll('.quantity-counter');
 
     try {
       const response = await fetch('/produto/add-to-cart', {
@@ -145,6 +145,56 @@ addToCartButtons.forEach(button => {
     }
   });
 });
+
+document.querySelectorAll(".delete-from-cart-btn").forEach(button => {
+  button.addEventListener("click", function (event) {
+    event.preventDefault(); // Impede o comportamento padrão do botão
+
+    const itemId = this.getAttribute("data-item-id");
+
+    // Fazer a requisição AJAX
+    fetch("/produto/carrinho/deletar", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: new URLSearchParams({ "item_id": itemId })
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === "success") {
+          // Atualizar a quantidade exibida ou remover o item do DOM
+          const productDiv = document.querySelector(`[data-product-id="${itemId}"]`);
+          const quantitySpan = document.querySelector(".quantity-counter");
+
+          if (data.quantity > 0) {
+            quantitySpan.textContent = `Quantidade: ${data.quantity}`;
+          } else {
+            productDiv.remove()
+          }
+
+          console.log(data.item_id, data.quantity)
+        }
+      })
+      .catch(error => console.error("Error:", error));
+  });
+});
+
+function updateSubtotal() {
+  // Calcular o subtotal com base nos elementos ainda no carrinho
+  let subtotal = 0;
+  document.querySelectorAll("[data-product-id]").forEach(item => {
+    const quantity = parseInt(item.querySelector(".quantity-counter").textContent.split(": ")[1]);
+    const price = parseFloat(item.querySelector(".text-indigo-600").textContent.replace("R$", ""));
+    subtotal += quantity * price;
+  });
+
+  // Atualizar o subtotal exibido
+  document.getElementById("subtotal").textContent = `R$${subtotal.toFixed(2)}`;
+}
+
+// Inicializar o subtotal ao carregar a página
+updateSubtotal();
 
 
 // Tornar a função scrollToContent globalmente acessível
