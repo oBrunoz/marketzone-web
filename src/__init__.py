@@ -91,7 +91,9 @@ async def login_user(request: Request):
 async def logar_user(request: Request, db: Session = Depends(get_db), email: str = Form(...), hashed_password: str = Form(...)):
     user = crud_service.get_user_by_email(db, email)
     if not user or not pwd_context.verify(hashed_password, user.hashed_password):
-        raise HTTPException(status_code=401, detail="Credenciais inválidas")
+        flash(request, "Email ou senha incorretos. Por favor, tente novamente", "red")
+        return templates.TemplateResponse("login_user.html", {"request": request})
+        # raise HTTPException(status_code=401, detail="Credenciais inválidas")
     
     request.session["user"] = {
         "id": user.id,
@@ -99,7 +101,7 @@ async def logar_user(request: Request, db: Session = Depends(get_db), email: str
         "username": user.username
     }
     
-    return 'logado'
+    return RedirectResponse('/', 303)
 
 @app.get("/logout")
 async def logout(request: Request):
