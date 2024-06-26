@@ -204,7 +204,7 @@ def delete_element(request: Request, item_id: int = Form(...)):
             session_total -= 1
         else:
             del session_cart[item_id_str]
-            session_total -= 1
+            session_total = 0
 
         request.session["cart_items"] = session_cart
         request.session['total'] = session_total

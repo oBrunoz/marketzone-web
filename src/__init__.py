@@ -1,10 +1,8 @@
 from fastapi import FastAPI, Depends, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
-
 from src.schemas import user_schema
-from .models.User import Base
-from .database.db import engine, get_db
+from .database.db import engine, get_db, Base
 from .services import crud_service
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -13,10 +11,10 @@ from src.views.routes import produto_router
 from starlette.middleware import Middleware
 from starlette.middleware.sessions import SessionMiddleware
 from dotenv import load_dotenv
-from os import environ
 from passlib.context import CryptContext
 
 load_dotenv()
+
 # Configuração do banco de dados
 Base.metadata.create_all(bind=engine)
 
