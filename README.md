@@ -1,7 +1,7 @@
-# README do Projeto de API Web
+# Projeto de API Web MarketZone
 
 ## Introdução
-Este é o README do projeto de API web **Gerenciamento de Produtos e Carrinho de Compras**, desenvolvido para a disciplina **Desenvolvimento de Sistemas Web**. A API é uma ferramenta para gerenciar produtos e o carrinho de compras de um e-commerce fictício. Permite operações como cadastro de produtos, adição de produtos ao carrinho, visualização do carrinho e finalização de compras. Além disso, possui funcionalidades de autenticação e perfil de usuário.
+Este é o README do projeto de API web **Market Zone**, desenvolvido para a disciplina **Desenvolvimento de Sistemas Web**. A API é uma ferramenta para gerenciar produtos e o carrinho de compras de um e-commerce fictício. Permite operações como cadastro de produtos, adição de produtos ao carrinho, visualização do carrinho e finalização de compras. Além disso, possui funcionalidades de autenticação e perfil de usuário.
 
 ## Funcionalidades
 - **Cadastro de Produtos**: Permite o cadastro de novos produtos com informações detalhadas como nome, descrição, preço, categoria, avaliação e imagem.
