@@ -119,10 +119,10 @@
       <div class="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 text-white p-4">
         <h1 class="mb-4 text-2xl md:text-4xl lg:text-5xl font-bold text-center">Não possui um cadastro? Cadastre-se já
           clicando no botão abaixo!</h1>
-        <button
+        <a href="{{ url_for('cadastro_user') }}"
           class="px-6 py-2 text-lg font-semibold bg-blue-600 hover:bg-blue-700 transition duration-300 rounded-lg shadow-md">
           Cadastre-se
-        </button>
+        </a>
       </div>
     </div>
     <!-- Item 2 -->
