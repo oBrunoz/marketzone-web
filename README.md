@@ -1,7 +1,7 @@
 # Projeto de API Web MarketZone
 
 ## Introdução
-Este é o README do projeto de API web **Market Zone**, desenvolvido para a disciplina **Desenvolvimento de Sistemas Web**. A API é uma ferramenta para gerenciar produtos e o carrinho de compras de um e-commerce fictício. Permite operações como cadastro de produtos, adição de produtos ao carrinho, visualização do carrinho e finalização de compras. Além disso, possui funcionalidades de autenticação e perfil de usuário.
+A API é uma ferramenta para gerenciar produtos e o carrinho de compras de um e-commerce fictício. Permite operações como cadastro de produtos, adição de produtos ao carrinho, visualização do carrinho e finalização de compras. Além disso, possui funcionalidades de autenticação e perfil de usuário.
 
 ## Funcionalidades
 - **Cadastro de Produtos**: Permite o cadastro de novos produtos com informações detalhadas como nome, descrição, preço, categoria, avaliação e imagem.
@@ -178,19 +178,3 @@ Certifique-se de que você tem o Python 3.8 ou superior instalado no seu ambient
        "password": "newpassword"
    }
    ```
-
-## Testes
-
-- **Teste de Cadastro de Produto**: Verificar se a rota `/produto/cadastro` permite o cadastro de novos produtos com todos os campos obrigatórios e opcionais.
-- **Teste de Adição ao Carrinho**: Validar se a função de adicionar produtos ao carrinho está incrementando a quantidade corretamente e atualizando a sessão.
-- **Teste de Finalização de Compra**: Confirmar se a compra é finalizada com sucesso e o estoque dos produtos é atualizado adequadamente.
-- **Teste de Cadastro de Usuário**: Verificar se a rota `/cadastro` permite o cadastro de novos usuários com todos os campos obrigatórios.
-- **Teste de Login de Usuário**: Validar se a função de login autentica corretamente os usuários e cria a sessão.
-- **Teste de Atualização de Perfil**: Confirmar se a rota `/update_profile` permite a atualização dos dados do usuário autenticado.
-
-## Contribuição
-
-- **[Nome do Contribuidor 1]**: Responsável pelo desenvolvimento inicial e configuração do projeto.
-- **[Nome do Contribuidor 2]**: Auxiliou na implementação das funcionalidades de carrinho de compras e finalização de compra.
-- **[Nome do Contribuidor 3]**: Implementou as rotas de cadastro de produto e auxiliou nos testes da API.
-- **[Nome do Contribuidor 4]**: Desenvolveu as funcionalidades de autenticação de usuário e gerenciamento de perfil.
