@@ -1,4 +1,4 @@
-# Projeto de API Web MarketZone
+# MarketZone
 
 ## Introdução
 A API é uma ferramenta para gerenciar produtos e o carrinho de compras de um e-commerce fictício. Permite operações como cadastro de produtos, adição de produtos ao carrinho, visualização do carrinho e finalização de compras. Além disso, possui funcionalidades de autenticação e perfil de usuário.
