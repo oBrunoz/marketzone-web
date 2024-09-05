@@ -30,7 +30,6 @@ produto_router = APIRouter(
 async def cadastro(request: Request):
 
     if request.session.get('user'):
-        print('pode acessar')
         return templates.TemplateResponse(
             name='produtos/cadastrar.html',
             request=request
@@ -135,9 +134,6 @@ async def add_to_cart(request: Request, db: Session = Depends(get_db), product_i
         raise HTTPException(status_code=404, detail="Produto não encontrado")
     # session_cart = request.session.get('cart_items', {})
     session_cart: Dict[str, Dict[str, int]] = request.session.get('cart_items', {})
-
-    # Debug: print the type and contents of session_cart
-    print(f"Session Cart Before: {session_cart}")
     
     # Verificar se o produto já está no carrinho e incrementar a quantidade
     if str(product_id) in session_cart:
@@ -164,8 +160,6 @@ async def add_to_cart(request: Request, db: Session = Depends(get_db), product_i
 @produto_router.get('/carrinho', response_class=HTMLResponse)
 async def cart(request: Request, db: Session = Depends(get_db)):
     session_cart = request.session.get("cart_items", {})
-    print(session_cart)
-    print(request.session.get('user', {}))
 
     product_ids = list(session_cart.keys())
 
