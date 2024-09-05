@@ -1,16 +1,14 @@
 from decimal import Decimal
 import shutil
 from typing import Dict
-from fastapi import Cookie, FastAPI, Depends, HTTPException, Request, Form, UploadFile, File, APIRouter
+from fastapi import Depends, HTTPException, Request, Form, UploadFile, File, APIRouter
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
-from fastapi.responses import Response
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from src.models import Produto
-from src.database.db import SessionLocal, engine, get_db
-from src.schemas import produto_schema, user_schema
-from src.services import crud_service
-from src.services.crud_service import create_produto, get_produto, get_produtos, get_produtos_by_ids
+from src.database.db import get_db
+from src.schemas import produto_schema
+from src.services.crud_service import create_produto, get_produto, get_produtos_by_ids
 from src.utils.util import flash, get_current_user_id
 from pathlib import Path
 
@@ -118,13 +116,10 @@ async def cadastrar_produto(
         db_produto = create_produto(db=db, produto=data_produto)
 
         if db_produto:
-            print('produto cadastrado')
             return RedirectResponse("/", status_code=303)
         else:
-            print('nao cadastrado')
             return templates.TemplateResponse("produtos/cadastrar.html", {"request": request})
     except Exception as e:
-        print(e)
         return templates.TemplateResponse("produtos/cadastrar.html", {"request": request})
 
 @produto_router.post('/add-to-cart')
